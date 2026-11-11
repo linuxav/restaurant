@@ -35,7 +35,7 @@ public class ContactController {
         MimeMessage mimeMessage = mailSender.createMimeMessage();
         MimeMessageHelper mail = new MimeMessageHelper(mimeMessage, true);
         mail.setFrom(email);
-        mail.setTo("webdevilstu@gmail.com");
+        mail.setTo("valentinealex1404@gmail.com");
         mail.setSubject("you received a message");
         mail.setText(message);
 
