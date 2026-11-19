@@ -1,4 +1,4 @@
-# Build stage: compiles your Maven project
+# Build stage: compiles Maven project
 FROM maven:3.9.6-eclipse-temurin-17 AS build
 COPY . /app
 WORKDIR /app
