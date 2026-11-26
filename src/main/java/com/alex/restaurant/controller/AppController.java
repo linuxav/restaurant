@@ -2,29 +2,28 @@ package com.alex.restaurant.controller;
 
 import java.util.List;
 
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 
 import com.alex.restaurant.entity.User;
-import com.alex.restaurant.repository.UserRepository;
+import com.alex.restaurant.exception.DuplicateRegistrationException;
+import com.alex.restaurant.service.UserService;
 
 @Controller
 public class AppController {
 
-    private final UserRepository userRepo;
-    private final PasswordEncoder passwordEncoder;
+    private final UserService userService;
 
-    public AppController(UserRepository userRepo, PasswordEncoder passwordEncoder) {
-        this.userRepo = userRepo;
-        this.passwordEncoder = passwordEncoder;
+    public AppController(UserService userService) {
+        this.userService = userService;
     }
 
     @GetMapping({"", "/index", "/home"})
     public String viewHomePage() {
-        return "redirect:/index.html";
+        return "index";
     }
 
     @GetMapping("/register")
@@ -34,16 +33,19 @@ public class AppController {
     }
 
     @PostMapping("/process_register")
-    public String processRegister(User user) {
-        String encodedPassword = passwordEncoder.encode(user.getPassword());
-        user.setPassword(encodedPassword);
-        userRepo.save(user);
-        return "register_success";
+    public String processRegister(@ModelAttribute("user") User user, Model model) {
+        try {
+            userService.registerUser(user);
+            return "register_success";
+        } catch (DuplicateRegistrationException ex) {
+            model.addAttribute("errorMessage", ex.getMessage());
+            return "signup_form";
+        }
     }
 
     @GetMapping("/users")
     public String listUsers(Model model) {
-        List<User> listUsers = userRepo.findAll();
+        List<User> listUsers = userService.getAllUsers();
         model.addAttribute("listUsers", listUsers);
         return "users";
     }
